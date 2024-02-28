@@ -9,10 +9,10 @@ type FuzzyMembershipFunction struct {
 }
 
 type StartOrEndDomain struct {
-	FirstEdge  float32
-	SecondEdge float32
-	Label      string
-	Weight     float32
+	FirstPoint  float32
+	SecondPoint float32
+	Label       string
+	Weight      float32
 }
 
 type FuzzyLogic struct {
@@ -24,18 +24,18 @@ type FuzzyLogic struct {
 
 func (soed *StartOrEndDomain) CalculateWeight(input float32, DomainType int16) {
 	if DomainType == START {
-		if input <= soed.FirstEdge {
+		if input <= soed.FirstPoint {
 			soed.Weight = 1
-		} else if input > soed.FirstEdge && input <= soed.SecondEdge {
-			soed.Weight = (soed.SecondEdge - input) / (soed.SecondEdge - soed.FirstEdge)
+		} else if input > soed.FirstPoint && input <= soed.SecondPoint {
+			soed.Weight = (soed.SecondPoint - input) / (soed.SecondPoint - soed.FirstPoint)
 		} else {
 			soed.Weight = 0
 		}
 	} else if DomainType == END {
-		if input <= soed.FirstEdge {
+		if input <= soed.FirstPoint {
 			soed.Weight = 0
-		} else if input > soed.FirstEdge && input <= soed.SecondEdge {
-			soed.Weight = (input - soed.FirstEdge) / (soed.SecondEdge - soed.FirstEdge)
+		} else if input > soed.FirstPoint && input <= soed.SecondPoint {
+			soed.Weight = (input - soed.FirstPoint) / (soed.SecondPoint - soed.FirstPoint)
 		} else {
 			soed.Weight = 1
 		}
@@ -44,31 +44,31 @@ func (soed *StartOrEndDomain) CalculateWeight(input float32, DomainType int16) {
 	}
 }
 
-func (fl *FuzzyLogic) SetMinDomain(label string, firstEdge float32, secondEdge float32) {
+func (fl *FuzzyLogic) SetMinDomain(label string, firstPoint float32, secondPoint float32) {
 	fl.MinDomain.Label = label
-	fl.MinDomain.FirstEdge = firstEdge
-	fl.MinDomain.SecondEdge = secondEdge
+	fl.MinDomain.FirstPoint = firstPoint
+	fl.MinDomain.SecondPoint = secondPoint
 }
 
-func (fl *FuzzyLogic) SetMaxDomain(label string, firstEdge float32, secondEdge float32) {
+func (fl *FuzzyLogic) SetMaxDomain(label string, firstPoint float32, secondPoint float32) {
 	fl.MaxDomain.Label = label
-	fl.MaxDomain.FirstEdge = firstEdge
-	fl.MaxDomain.SecondEdge = secondEdge
+	fl.MaxDomain.FirstPoint = firstPoint
+	fl.MaxDomain.SecondPoint = secondPoint
 }
 
-func (fl *FuzzyLogic) AddTriangleFunction(firstEdge float32, secondEdge float32, thirdEdge float32, label string) {
-	Triangle := NewTriangleFunction(firstEdge, secondEdge, thirdEdge, label)
+func (fl *FuzzyLogic) AddTriangleFunction(firstPoint float32, secondPoint float32, thirdPoint float32, label string) {
+	Triangle := NewTriangleFunction(firstPoint, secondPoint, thirdPoint, label)
 	fl.Membership = append(fl.Membership, *Triangle)
 }
 
 func (fl *FuzzyLogic) CalculateWeight(input float32) {
-	// Get Min Domain Weight
+	// Mencari Bobot dari Domain Terendah
 	fl.MinDomain.CalculateWeight(input, START)
 
-	// Get Max Domain Weight
+	// Mencari Bobot dar Domain Tertinggi
 	fl.MaxDomain.CalculateWeight(input, END)
 
-	// Get Triangle Domain Weight
+	// Mendapatkan Bobot dari Fungsi Segitiga
 	for i, _ := range fl.Membership {
 		fl.Membership[i].CalculateWeight(input)
 	}
